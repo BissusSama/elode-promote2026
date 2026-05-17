@@ -57,6 +57,12 @@ tr:last-child td{border-bottom:none}
 .lock-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif;letter-spacing:2px}
 .lock-row button{padding:9px 16px;background:var(--mid);color:var(--g);border:.5px solid rgba(29,196,122,.3);border-radius:8px;font-size:13px;font-family:"DM Sans",sans-serif;cursor:pointer}
 .admin-panel{display:none}
+.data-lock{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:14px;padding:2rem;text-align:center;margin-bottom:1rem}
+.data-lock-icon{font-size:36px;margin-bottom:.75rem}
+.data-lock input{width:100%;max-width:280px;border:.5px solid var(--border);border-radius:8px;padding:11px 13px;font-size:14px;font-family:"DM Sans",sans-serif;background:rgba(255,255,255,.04);color:#fff;outline:none;text-align:center;letter-spacing:3px;margin:.75rem auto 0;display:block}
+.data-lock input:focus{border-color:rgba(29,196,122,.5)}
+.data-lock button{margin-top:.75rem;padding:11px 28px;background:linear-gradient(135deg,var(--g),var(--t));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:500;font-family:"DM Sans",sans-serif;cursor:pointer}
+.data-content{display:none}
 .badge-live{display:inline-flex;align-items:center;gap:5px;background:rgba(29,196,122,.12);border:.5px solid rgba(29,196,122,.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--g);margin-bottom:1rem}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -65,8 +71,6 @@ tr:last-child td{border-bottom:none}
 .url-row{display:flex;gap:.5rem;margin-top:.75rem}
 .url-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif}
 .url-row button{padding:10px 16px;background:linear-gradient(135deg,var(--g),var(--t));color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;font-family:"DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
-
-/* Stats cards */
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.25rem}
 @media(max-width:500px){.stats-grid{grid-template-columns:1fr}}
 .stat-card{background:var(--mid);border:.5px solid var(--border);border-radius:12px;padding:1.1rem;text-align:center}
@@ -122,7 +126,7 @@ tr:last-child td{border-bottom:none}
   <div class="card" style="margin-top:1.25rem">
     <div class="card-label">Message WhatsApp automatique</div>
     <div class="wa-box">
-      Bienvenue chez ELODE &#127881;<br>
+      Bienvenue chez ELODE &#129463;<br>
       Merci pour votre passage &agrave; PROMOTE 2026.<br>
       Remplissez ce mini formulaire pour recevoir :<br>
       &bull; votre bilan bucco-dentaire offert,<br>
@@ -137,8 +141,8 @@ tr:last-child td{border-bottom:none}
     <div id="lock-box" class="lock-box">
       <div style="font-size:13px;color:var(--muted);margin-bottom:.25rem">Entrez le mot de passe pour modifier l'URL des QR codes.</div>
       <div class="lock-row">
-        <input type="password" id="admin-pass" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPass()">
-        <button onclick="checkPass()">D&eacute;verrouiller</button>
+        <input type="password" id="admin-pass" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkAdminPass()">
+        <button onclick="checkAdminPass()">D&eacute;verrouiller</button>
       </div>
       <div id="pass-err" style="font-size:12px;color:#e24b4a;margin-top:.4rem"></div>
     </div>
@@ -158,7 +162,7 @@ tr:last-child td{border-bottom:none}
   <div id="fw">
     <div class="card">
       <div class="badge-live"><div class="dot"></div> Formulaire en ligne</div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:.2rem">Bienvenue chez ELODE &#127881;</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:.2rem">Bienvenue chez ELODE &#129463;</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:1.4rem;line-height:1.7">Merci pour votre passage &agrave; PROMOTE 2026. Remplissez ce formulaire pour recevoir votre bilan bucco-dentaire offert, les promotions PROMOTE et votre cadeau ELODE.</div>
       <div class="row2">
         <div class="field"><label>Nom</label><input type="text" id="f-nom" placeholder="Votre nom"></div>
@@ -199,17 +203,31 @@ tr:last-child td{border-bottom:none}
 
 <!-- DATA -->
 <div id="t-data" style="display:none">
-  <div class="dh">
-    <div class="dc">Tableau de bord PROMOTE 2026</div>
-    <button class="ebtn" onclick="loadData()">&#8635; Actualiser</button>
+
+  <!-- Verrou données -->
+  <div id="data-lock" class="data-lock">
+    <div class="data-lock-icon">&#128274;</div>
+    <div style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:.25rem">Accès protégé</div>
+    <div style="font-size:13px;color:var(--muted)">Entrez le mot de passe pour consulter les données.</div>
+    <input type="password" id="data-pass" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkDataPass()">
+    <div id="data-pass-err" style="font-size:12px;color:#e24b4a;margin-top:.4rem"></div>
+    <button onclick="checkDataPass()">Accéder aux données</button>
   </div>
-  <div id="stats-area"></div>
-  <div class="card" style="padding:.5rem;overflow:hidden">
-    <div id="entries"><div class="empty">Chargement des données...</div></div>
-  </div>
-  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:.75rem">
-    Données en temps réel depuis Google Sheets &mdash;
-    <a href="https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ" target="_blank" style="color:var(--g)">Ouvrir le Sheet</a>
+
+  <!-- Contenu données -->
+  <div id="data-content" class="data-content">
+    <div class="dh">
+      <div class="dc">Tableau de bord PROMOTE 2026</div>
+      <button class="ebtn" onclick="loadData()">&#8635; Actualiser</button>
+    </div>
+    <div id="stats-area"></div>
+    <div class="card" style="padding:.5rem;overflow:hidden">
+      <div id="entries"><div class="empty">Chargement...</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:.75rem">
+      Données en temps réel depuis Google Sheets &mdash;
+      <a href="https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ" target="_blank" style="color:var(--g)">Ouvrir le Sheet</a>
+    </div>
   </div>
 </div>
 
@@ -221,10 +239,12 @@ var PHONE = '237652286570';
 var WEBAPP = 'https://script.google.com/macros/s/AKfycbwHS5CiF8XVmZvLZaAuxT7t2-YM-p2vtc8YQ98ORr5KsEkv_zdt2wwyrYevZO3QqagZ/exec';
 var FORM_URL = 'https://bissusSama.github.io/elode-promote2026';
 var ADMIN_PASS = 'elode2026';
+var DATA_PASS = '@promote2026';
 var adminUnlocked = false;
+var dataUnlocked = false;
 
 function buildWA(url) {
-  var msg = 'Bienvenue chez ELODE \uD83C\uDF89\n'
+  var msg = 'Bienvenue chez ELODE \uD83E\uDDB7\n'
     + 'Merci pour votre passage \u00e0 PROMOTE 2026.\n'
     + 'Remplissez ce mini formulaire pour recevoir :\n'
     + '\u2022 votre bilan bucco-dentaire offert,\n'
@@ -262,7 +282,7 @@ function genQRs() {
   document.getElementById('url-display').textContent = FORM_URL;
 }
 
-function checkPass() {
+function checkAdminPass() {
   var p = document.getElementById('admin-pass').value;
   if (p === ADMIN_PASS) {
     adminUnlocked = true;
@@ -271,6 +291,19 @@ function checkPass() {
   } else {
     document.getElementById('pass-err').textContent = 'Mot de passe incorrect.';
     document.getElementById('admin-pass').value = '';
+  }
+}
+
+function checkDataPass() {
+  var p = document.getElementById('data-pass').value;
+  if (p === DATA_PASS) {
+    dataUnlocked = true;
+    document.getElementById('data-lock').style.display = 'none';
+    document.getElementById('data-content').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('data-pass-err').textContent = 'Mot de passe incorrect.';
+    document.getElementById('data-pass').value = '';
   }
 }
 
@@ -312,7 +345,7 @@ function showTab(n) {
   document.querySelectorAll('.tb').forEach(function(el, i) {
     el.classList.toggle('active', tabs[i] === n);
   });
-  if (n === 'data') loadData();
+  if (n === 'data' && dataUnlocked) loadData();
 }
 
 function submitForm() {
@@ -362,68 +395,66 @@ function resetForm() {
 function loadData() {
   document.getElementById('entries').innerHTML = '<div class="empty">Chargement...</div>';
   document.getElementById('stats-area').innerHTML = '';
-  fetch('https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ/gviz/tq?tqx=out:json&sheet=Sheet1')
+
+  var url = 'https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ/gviz/tq?tqx=out:json&sheet=Sheet1&headers=1';
+  fetch(url)
     .then(function(r) { return r.text(); })
     .then(function(text) {
-      var json = JSON.parse(text.replace(/^[^{]*/, '').replace(/[^}]*$/, ''));
-      var rows = json.table ? json.table.rows : [];
-      if (!rows || rows.length <= 1) {
-        document.getElementById('cnt-tab').textContent = '0';
-        renderStats(0, [], []);
-        document.getElementById('entries').innerHTML = '<div class="empty">Aucune inscription pour l\'instant.</div>';
-        return;
-      }
-      var dataRows = rows.slice(1);
+      // Strip the google callback wrapper
+      var start = text.indexOf('{');
+      var end = text.lastIndexOf('}');
+      var json = JSON.parse(text.substring(start, end + 1));
+      var rows = (json.table && json.table.rows) ? json.table.rows : [];
+
+      // Filter out header row if present
+      var dataRows = rows.filter(function(row) {
+        var first = row.c && row.c[0] && row.c[0].v;
+        return first && first !== 'Date' && first !== 'date';
+      });
+
       var total = dataRows.length;
       document.getElementById('cnt-tab').textContent = total;
 
-      // Collect cities and besoins
       var villes = {};
       var besoins = {};
       dataRows.forEach(function(row) {
         var c = row.c;
-        var get = function(i) { return (c && c[i] && c[i].v) ? String(c[i].v) : ''; };
-        var v = get(5); if (v && v !== '\u2014') villes[v] = (villes[v]||0)+1;
-        var b = get(6); if (b && b !== '\u2014') besoins[b] = (besoins[b]||0)+1;
+        var get = function(i) { return (c && c[i] && c[i].v != null) ? String(c[i].v) : ''; };
+        var v = get(5); if (v) villes[v] = (villes[v]||0)+1;
+        var b = get(6); if (b) besoins[b] = (besoins[b]||0)+1;
       });
+
       renderStats(total, villes, besoins);
 
-      // Table
+      if (!dataRows.length) {
+        document.getElementById('entries').innerHTML = '<div class="empty">Aucune inscription pour l\'instant.</div>';
+        return;
+      }
+
       var html = '<div class="tw"><table><thead><tr><th>#</th><th>Date</th><th>Nom</th><th>Pr\u00e9nom</th><th>WhatsApp</th><th>\u00c2ge</th><th>Ville</th><th>Besoin</th><th>Date souhait\u00e9e</th></tr></thead><tbody>';
       dataRows.forEach(function(row, i) {
         var c = row.c;
-        var get = function(idx) { return (c && c[idx] && c[idx].v) ? String(c[idx].v) : '\u2014'; };
+        var get = function(idx) { return (c && c[idx] && c[idx].v != null) ? String(c[idx].v) : '\u2014'; };
         html += '<tr><td style="color:var(--muted)">'+(i+1)+'</td><td>'+get(0)+'</td><td>'+get(1)+'</td><td>'+get(2)+'</td><td>'+get(3)+'</td><td>'+get(4)+'</td><td>'+get(5)+'</td><td>'+get(6)+'</td><td>'+get(7)+'</td></tr>';
       });
       html += '</tbody></table></div>';
       document.getElementById('entries').innerHTML = html;
     }).catch(function(e) {
       console.error(e);
-      document.getElementById('entries').innerHTML = '<div class="empty">Impossible de charger les donn\u00e9es.<br>V\u00e9rifiez que votre Google Sheet est en acc\u00e8s public en lecture.</div>';
+      document.getElementById('entries').innerHTML = '<div class="empty">Impossible de charger les donn\u00e9es.<br><br>Dans votre Google Sheet :<br><strong>Fichier \u2192 Partager \u2192 Tout le monde avec le lien \u2192 Lecteur</strong></div>';
     });
 }
 
 function renderStats(total, villes, besoins) {
-  // Top ville
   var topVille = '\u2014';
   var maxV = 0;
   Object.keys(villes).forEach(function(k) { if (villes[k] > maxV) { maxV = villes[k]; topVille = k; } });
 
-  // Top besoin
-  var topBesoin = '\u2014';
-  var maxB = 0;
-  Object.keys(besoins).forEach(function(k) { if (besoins[k] > maxB) { maxB = besoins[k]; topBesoin = k; } });
-
-  // Shorten top besoin label
-  var shortBesoin = topBesoin.length > 18 ? topBesoin.substring(0, 16) + '...' : topBesoin;
-
   var statsHTML = '<div class="stats-grid">'
     + '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Inscriptions</div><div class="stat-sub">total cumul\u00e9</div></div>'
     + '<div class="stat-card"><div class="stat-num" style="font-size:20px;padding-top:6px">'+topVille+'</div><div class="stat-label">Ville principale</div><div class="stat-sub">'+(maxV > 0 ? maxV+' personne'+(maxV>1?'s':'') : '')+'</div></div>'
-    + '<div class="stat-card"><div class="stat-num" style="font-size:16px;padding-top:8px">'+shortBesoin+'</div><div class="stat-label">Besoin principal</div><div class="stat-sub">'+(maxB > 0 ? maxB+' demande'+(maxB>1?'s':'') : '')+'</div></div>'
     + '</div>';
 
-  // Besoin breakdown bars
   if (Object.keys(besoins).length > 0) {
     statsHTML += '<div class="card" style="margin-bottom:1rem"><div class="card-label">R\u00e9partition par besoin</div><div class="besoin-bars">';
     var sorted = Object.keys(besoins).sort(function(a,b){return besoins[b]-besoins[a];});
@@ -438,7 +469,6 @@ function renderStats(total, villes, besoins) {
     });
     statsHTML += '</div></div>';
   }
-
   document.getElementById('stats-area').innerHTML = statsHTML;
 }
 
