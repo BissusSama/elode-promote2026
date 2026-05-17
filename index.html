@@ -52,14 +52,6 @@ th{text-align:left;padding:7px 9px;font-size:10px;font-weight:500;color:var(--mu
 td{padding:9px 9px;border-bottom:.5px solid rgba(255,255,255,.05);color:#cdd8d3;white-space:nowrap}
 tr:last-child td{border-bottom:none}
 .empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:13px;line-height:1.9}
-.step{display:flex;gap:1rem;align-items:flex-start;margin-bottom:1.2rem}
-.snum{min-width:28px;height:28px;border-radius:50%;background:rgba(29,196,122,.15);color:var(--g);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:.5px solid rgba(29,196,122,.3)}
-.stxt{font-size:13px;color:#cdd8d3;line-height:1.7;padding-top:4px}
-.stxt strong{color:#fff}
-.stxt code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:12px;color:var(--g)}
-.url-row{display:flex;gap:.5rem;margin-top:.75rem}
-.url-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif}
-.url-row button{padding:10px 16px;background:linear-gradient(135deg,var(--g),var(--t));color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;font-family:"DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
 .lock-box{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.75rem}
 .lock-row{display:flex;gap:.5rem;margin-top:.5rem}
 .lock-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif;letter-spacing:2px}
@@ -70,6 +62,23 @@ tr:last-child td{border-bottom:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+.url-row{display:flex;gap:.5rem;margin-top:.75rem}
+.url-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif}
+.url-row button{padding:10px 16px;background:linear-gradient(135deg,var(--g),var(--t));color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;font-family:"DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
+
+/* Stats cards */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.25rem}
+@media(max-width:500px){.stats-grid{grid-template-columns:1fr}}
+.stat-card{background:var(--mid);border:.5px solid var(--border);border-radius:12px;padding:1.1rem;text-align:center}
+.stat-num{font-family:"Playfair Display",serif;font-size:36px;font-weight:700;background:linear-gradient(135deg,var(--g),var(--t));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1}
+.stat-label{font-size:11px;color:var(--muted);margin-top:.3rem;letter-spacing:.5px;text-transform:uppercase}
+.stat-sub{font-size:10px;color:rgba(107,138,122,.6);margin-top:.15rem}
+.besoin-bars{margin-top:.5rem}
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.bar-label{font-size:11px;color:var(--muted);width:140px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--g),var(--t));transition:width .6s ease}
+.bar-count{font-size:11px;color:var(--muted);width:20px;text-align:right;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -123,24 +132,21 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
 
-  <!-- ADMIN SECTION -->
   <div class="card">
     <div class="card-label">&#128274; Zone administrateur</div>
-
     <div id="lock-box" class="lock-box">
       <div style="font-size:13px;color:var(--muted);margin-bottom:.25rem">Entrez le mot de passe pour modifier l'URL des QR codes.</div>
       <div class="lock-row">
         <input type="password" id="admin-pass" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPass()">
-        <button onclick="checkPass()">&#128275; D&eacute;verrouiller</button>
+        <button onclick="checkPass()">D&eacute;verrouiller</button>
       </div>
       <div id="pass-err" style="font-size:12px;color:#e24b4a;margin-top:.4rem"></div>
     </div>
-
     <div id="admin-panel" class="admin-panel">
-      <div style="font-size:12px;color:var(--g);margin-bottom:.5rem">&#10003; Accès administrateur activé</div>
+      <div style="font-size:12px;color:var(--g);margin-bottom:.4rem">&#10003; Accès administrateur activé</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:.25rem">URL actuelle : <span id="url-display" style="color:#fff"></span></div>
       <div class="url-row">
-        <input id="gh-url" type="text" placeholder="https://votre-pseudo.github.io/elode-promote2026">
+        <input id="gh-url" type="text" placeholder="https://bissusSama.github.io/elode-promote2026">
         <button onclick="updateURL()">Mettre &agrave; jour</button>
       </div>
     </div>
@@ -194,14 +200,15 @@ tr:last-child td{border-bottom:none}
 <!-- DATA -->
 <div id="t-data" style="display:none">
   <div class="dh">
-    <div class="dc">Inscriptions en temps r&eacute;el</div>
+    <div class="dc">Tableau de bord PROMOTE 2026</div>
     <button class="ebtn" onclick="loadData()">&#8635; Actualiser</button>
   </div>
+  <div id="stats-area"></div>
   <div class="card" style="padding:.5rem;overflow:hidden">
-    <div id="entries"><div class="empty">Cliquez sur "Données" pour charger les inscriptions.</div></div>
+    <div id="entries"><div class="empty">Chargement des données...</div></div>
   </div>
-  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:.5rem">
-    Données stockées dans Google Sheets &mdash; 
+  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:.75rem">
+    Données en temps réel depuis Google Sheets &mdash;
     <a href="https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ" target="_blank" style="color:var(--g)">Ouvrir le Sheet</a>
   </div>
 </div>
@@ -210,7 +217,7 @@ tr:last-child td{border-bottom:none}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 
-var PHONE = '237698193590';
+var PHONE = '237652286570';
 var WEBAPP = 'https://script.google.com/macros/s/AKfycbwHS5CiF8XVmZvLZaAuxT7t2-YM-p2vtc8YQ98ORr5KsEkv_zdt2wwyrYevZO3QqagZ/exec';
 var FORM_URL = 'https://bissusSama.github.io/elode-promote2026';
 var ADMIN_PASS = 'elode2026';
@@ -269,11 +276,11 @@ function checkPass() {
 
 function updateURL() {
   var v = document.getElementById('gh-url').value.trim();
-  if (!v || v.indexOf('http') !== 0) { alert('URL invalide. Elle doit commencer par https://'); return; }
+  if (!v || v.indexOf('http') !== 0) { alert('URL invalide.'); return; }
   FORM_URL = v;
   genQRs();
   document.getElementById('gh-url').value = '';
-  alert('QR codes mis \u00e0 jour avec : ' + v);
+  alert('QR codes mis \u00e0 jour !');
 }
 
 function dlQR(cid, name) {
@@ -316,30 +323,25 @@ function submitForm() {
   var ville = document.getElementById('f-ville').value.trim();
   var besoin = document.getElementById('f-besoin').value;
   var date = document.getElementById('f-date').value;
-
   if (!nom || !prenom || !tel || !besoin) {
     alert('Veuillez remplir : nom, pr\u00e9nom, num\u00e9ro WhatsApp et besoin dentaire.');
     return;
   }
-
   var btn = document.getElementById('submit-btn');
   var sp = document.getElementById('submit-spinner');
   btn.disabled = true;
   btn.textContent = 'Envoi en cours...';
   sp.style.display = 'block';
-
   var payload = {nom:nom, prenom:prenom, tel:tel, age:age, ville:ville, besoin:besoin, date:date};
-
   fetch(WEBAPP, {
-    method: 'POST',
-    mode: 'no-cors',
+    method: 'POST', mode: 'no-cors',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload)
   }).then(function() {
     document.getElementById('fw').style.display = 'none';
     document.getElementById('ok').style.display = 'block';
   }).catch(function() {
-    alert('Erreur de connexion. V\u00e9rifiez votre internet et r\u00e9essayez.');
+    alert('Erreur de connexion. R\u00e9essayez.');
     btn.disabled = false;
     btn.textContent = 'Envoyer ma demande \u2192';
     sp.style.display = 'none';
@@ -358,31 +360,86 @@ function resetForm() {
 }
 
 function loadData() {
-  var el = document.getElementById('entries');
-  el.innerHTML = '<div class="empty">Chargement depuis Google Sheets...</div>';
+  document.getElementById('entries').innerHTML = '<div class="empty">Chargement...</div>';
+  document.getElementById('stats-area').innerHTML = '';
   fetch('https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ/gviz/tq?tqx=out:json&sheet=Sheet1')
     .then(function(r) { return r.text(); })
     .then(function(text) {
-      var json = JSON.parse(text.replace(/.*?(\{.*\}).*/s, '$1'));
-      var rows = json.table.rows;
+      var json = JSON.parse(text.replace(/^[^{]*/, '').replace(/[^}]*$/, ''));
+      var rows = json.table ? json.table.rows : [];
       if (!rows || rows.length <= 1) {
-        el.innerHTML = '<div class="empty">Aucune inscription pour l\'instant.</div>';
         document.getElementById('cnt-tab').textContent = '0';
+        renderStats(0, [], []);
+        document.getElementById('entries').innerHTML = '<div class="empty">Aucune inscription pour l\'instant.</div>';
         return;
       }
       var dataRows = rows.slice(1);
-      document.getElementById('cnt-tab').textContent = dataRows.length;
-      var html = '<div class="tw"><table><thead><tr><th>Date</th><th>Nom</th><th>Pr\u00e9nom</th><th>WhatsApp</th><th>\u00c2ge</th><th>Ville</th><th>Besoin</th><th>Date souhait\u00e9e</th></tr></thead><tbody>';
+      var total = dataRows.length;
+      document.getElementById('cnt-tab').textContent = total;
+
+      // Collect cities and besoins
+      var villes = {};
+      var besoins = {};
       dataRows.forEach(function(row) {
         var c = row.c;
-        var get = function(i) { return (c[i] && c[i].v) ? c[i].v : '\u2014'; };
-        html += '<tr><td>'+get(0)+'</td><td>'+get(1)+'</td><td>'+get(2)+'</td><td>'+get(3)+'</td><td>'+get(4)+'</td><td>'+get(5)+'</td><td>'+get(6)+'</td><td>'+get(7)+'</td></tr>';
+        var get = function(i) { return (c && c[i] && c[i].v) ? String(c[i].v) : ''; };
+        var v = get(5); if (v && v !== '\u2014') villes[v] = (villes[v]||0)+1;
+        var b = get(6); if (b && b !== '\u2014') besoins[b] = (besoins[b]||0)+1;
+      });
+      renderStats(total, villes, besoins);
+
+      // Table
+      var html = '<div class="tw"><table><thead><tr><th>#</th><th>Date</th><th>Nom</th><th>Pr\u00e9nom</th><th>WhatsApp</th><th>\u00c2ge</th><th>Ville</th><th>Besoin</th><th>Date souhait\u00e9e</th></tr></thead><tbody>';
+      dataRows.forEach(function(row, i) {
+        var c = row.c;
+        var get = function(idx) { return (c && c[idx] && c[idx].v) ? String(c[idx].v) : '\u2014'; };
+        html += '<tr><td style="color:var(--muted)">'+(i+1)+'</td><td>'+get(0)+'</td><td>'+get(1)+'</td><td>'+get(2)+'</td><td>'+get(3)+'</td><td>'+get(4)+'</td><td>'+get(5)+'</td><td>'+get(6)+'</td><td>'+get(7)+'</td></tr>';
       });
       html += '</tbody></table></div>';
-      el.innerHTML = html;
-    }).catch(function() {
-      el.innerHTML = '<div class="empty">Impossible de charger les donn\u00e9es.<br>V\u00e9rifiez que votre Google Sheet est en acc\u00e8s public.</div>';
+      document.getElementById('entries').innerHTML = html;
+    }).catch(function(e) {
+      console.error(e);
+      document.getElementById('entries').innerHTML = '<div class="empty">Impossible de charger les donn\u00e9es.<br>V\u00e9rifiez que votre Google Sheet est en acc\u00e8s public en lecture.</div>';
     });
+}
+
+function renderStats(total, villes, besoins) {
+  // Top ville
+  var topVille = '\u2014';
+  var maxV = 0;
+  Object.keys(villes).forEach(function(k) { if (villes[k] > maxV) { maxV = villes[k]; topVille = k; } });
+
+  // Top besoin
+  var topBesoin = '\u2014';
+  var maxB = 0;
+  Object.keys(besoins).forEach(function(k) { if (besoins[k] > maxB) { maxB = besoins[k]; topBesoin = k; } });
+
+  // Shorten top besoin label
+  var shortBesoin = topBesoin.length > 18 ? topBesoin.substring(0, 16) + '...' : topBesoin;
+
+  var statsHTML = '<div class="stats-grid">'
+    + '<div class="stat-card"><div class="stat-num">'+total+'</div><div class="stat-label">Inscriptions</div><div class="stat-sub">total cumul\u00e9</div></div>'
+    + '<div class="stat-card"><div class="stat-num" style="font-size:20px;padding-top:6px">'+topVille+'</div><div class="stat-label">Ville principale</div><div class="stat-sub">'+(maxV > 0 ? maxV+' personne'+(maxV>1?'s':'') : '')+'</div></div>'
+    + '<div class="stat-card"><div class="stat-num" style="font-size:16px;padding-top:8px">'+shortBesoin+'</div><div class="stat-label">Besoin principal</div><div class="stat-sub">'+(maxB > 0 ? maxB+' demande'+(maxB>1?'s':'') : '')+'</div></div>'
+    + '</div>';
+
+  // Besoin breakdown bars
+  if (Object.keys(besoins).length > 0) {
+    statsHTML += '<div class="card" style="margin-bottom:1rem"><div class="card-label">R\u00e9partition par besoin</div><div class="besoin-bars">';
+    var sorted = Object.keys(besoins).sort(function(a,b){return besoins[b]-besoins[a];});
+    sorted.forEach(function(k) {
+      var pct = total > 0 ? Math.round(besoins[k]/total*100) : 0;
+      var short = k.length > 28 ? k.substring(0,26)+'...' : k;
+      statsHTML += '<div class="bar-row">'
+        + '<div class="bar-label">'+short+'</div>'
+        + '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div>'
+        + '<div class="bar-count">'+besoins[k]+'</div>'
+        + '</div>';
+    });
+    statsHTML += '</div></div>';
+  }
+
+  document.getElementById('stats-area').innerHTML = statsHTML;
 }
 
 window.addEventListener('load', function() { genQRs(); });
