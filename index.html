@@ -40,6 +40,7 @@ header{display:flex;flex-direction:column;align-items:center;padding:2.5rem 0 2r
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
 @media(max-width:460px){.row2{grid-template-columns:1fr}}
 .sbtn{width:100%;padding:13px;background:linear-gradient(135deg,var(--g),var(--t));color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:500;font-family:"DM Sans",sans-serif;cursor:pointer;margin-top:.4rem}
+.sbtn:disabled{opacity:.5;cursor:not-allowed}
 .ok{display:none;text-align:center;background:rgba(29,196,122,.08);border:.5px solid rgba(29,196,122,.3);border-radius:14px;padding:2.5rem 1.5rem}
 .bk{margin-top:1.1rem;padding:9px 20px;background:none;border:.5px solid var(--border);border-radius:8px;color:var(--muted);font-family:"DM Sans",sans-serif;font-size:13px;cursor:pointer}
 .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
@@ -59,6 +60,16 @@ tr:last-child td{border-bottom:none}
 .url-row{display:flex;gap:.5rem;margin-top:.75rem}
 .url-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif}
 .url-row button{padding:10px 16px;background:linear-gradient(135deg,var(--g),var(--t));color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;font-family:"DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.lock-box{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.75rem}
+.lock-row{display:flex;gap:.5rem;margin-top:.5rem}
+.lock-row input{flex:1;border:.5px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;background:rgba(255,255,255,.04);color:#fff;outline:none;font-family:"DM Sans",sans-serif;letter-spacing:2px}
+.lock-row button{padding:9px 16px;background:var(--mid);color:var(--g);border:.5px solid rgba(29,196,122,.3);border-radius:8px;font-size:13px;font-family:"DM Sans",sans-serif;cursor:pointer}
+.admin-panel{display:none}
+.badge-live{display:inline-flex;align-items:center;gap:5px;background:rgba(29,196,122,.12);border:.5px solid rgba(29,196,122,.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--g);margin-bottom:1rem}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -74,7 +85,6 @@ tr:last-child td{border-bottom:none}
   <button class="tb active" onclick="showTab('qr')">QR Codes</button>
   <button class="tb" onclick="showTab('form')">Formulaire</button>
   <button class="tb" onclick="showTab('data')">Donn&eacute;es (<span id="cnt-tab">0</span>)</button>
-  <button class="tb" onclick="showTab('guide')">Guide GitHub</button>
 </div>
 
 <!-- QR -->
@@ -109,16 +119,30 @@ tr:last-child td{border-bottom:none}
       &bull; votre bilan bucco-dentaire offert,<br>
       &bull; les promotions PROMOTE,<br>
       &bull; votre cadeau ELODE.<br><br>
-      &#128073; Formulaire : <span id="url-preview" style="color:var(--g)">[URL apr&egrave;s d&eacute;ploiement]</span>
+      &#128073; Formulaire : <span id="url-preview" style="color:var(--g)"></span>
     </div>
   </div>
 
+  <!-- ADMIN SECTION -->
   <div class="card">
-    <div class="card-label">Mettre &agrave; jour l'URL apr&egrave;s d&eacute;ploiement</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:.75rem">Apr&egrave;s avoir mis votre page en ligne sur GitHub Pages, collez votre URL ici pour r&eacute;g&eacute;n&eacute;rer les QR codes.</div>
-    <div class="url-row">
-      <input id="gh-url" type="text" placeholder="https://votre-pseudo.github.io/elode-promote2026">
-      <button onclick="updateURL()">Mettre &agrave; jour</button>
+    <div class="card-label">&#128274; Zone administrateur</div>
+
+    <div id="lock-box" class="lock-box">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:.25rem">Entrez le mot de passe pour modifier l'URL des QR codes.</div>
+      <div class="lock-row">
+        <input type="password" id="admin-pass" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')checkPass()">
+        <button onclick="checkPass()">&#128275; D&eacute;verrouiller</button>
+      </div>
+      <div id="pass-err" style="font-size:12px;color:#e24b4a;margin-top:.4rem"></div>
+    </div>
+
+    <div id="admin-panel" class="admin-panel">
+      <div style="font-size:12px;color:var(--g);margin-bottom:.5rem">&#10003; Accès administrateur activé</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:.25rem">URL actuelle : <span id="url-display" style="color:#fff"></span></div>
+      <div class="url-row">
+        <input id="gh-url" type="text" placeholder="https://votre-pseudo.github.io/elode-promote2026">
+        <button onclick="updateURL()">Mettre &agrave; jour</button>
+      </div>
     </div>
   </div>
 </div>
@@ -127,6 +151,7 @@ tr:last-child td{border-bottom:none}
 <div id="t-form" style="display:none">
   <div id="fw">
     <div class="card">
+      <div class="badge-live"><div class="dot"></div> Formulaire en ligne</div>
       <div style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:.2rem">Bienvenue chez ELODE &#127881;</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:1.4rem;line-height:1.7">Merci pour votre passage &agrave; PROMOTE 2026. Remplissez ce formulaire pour recevoir votre bilan bucco-dentaire offert, les promotions PROMOTE et votre cadeau ELODE.</div>
       <div class="row2">
@@ -154,13 +179,14 @@ tr:last-child td{border-bottom:none}
         </select>
       </div>
       <div class="field"><label>Date souhait&eacute;e de consultation</label><input type="date" id="f-date"></div>
-      <button class="sbtn" onclick="submitForm()">Envoyer ma demande &rarr;</button>
+      <div class="spinner" id="submit-spinner"></div>
+      <button class="sbtn" id="submit-btn" onclick="submitForm()">Envoyer ma demande &rarr;</button>
     </div>
   </div>
   <div class="ok" id="ok">
     <div style="font-size:38px;margin-bottom:.7rem">&#10003;</div>
     <div style="font-family:'Playfair Display',serif;font-size:20px">Merci, votre demande est enregistr&eacute;e !</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:.5rem;line-height:1.7">L'&eacute;quipe ELODE vous contactera tr&egrave;s prochainement sur WhatsApp.</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:.5rem;line-height:1.7">L'&eacute;quipe ELODE vous contactera tr&egrave;s prochainement sur WhatsApp pour confirmer votre rendez-vous.</div>
     <button class="bk" onclick="resetForm()">&#8592; Nouvelle inscription</button>
   </div>
 </div>
@@ -168,29 +194,15 @@ tr:last-child td{border-bottom:none}
 <!-- DATA -->
 <div id="t-data" style="display:none">
   <div class="dh">
-    <div class="dc">Inscriptions : <span id="cnt">0</span></div>
-    <button class="ebtn" onclick="exportCSV()">&#8595; Exporter CSV</button>
+    <div class="dc">Inscriptions en temps r&eacute;el</div>
+    <button class="ebtn" onclick="loadData()">&#8635; Actualiser</button>
   </div>
   <div class="card" style="padding:.5rem;overflow:hidden">
-    <div id="entries"><div class="empty">Aucune inscription pour l'instant.</div></div>
+    <div id="entries"><div class="empty">Cliquez sur "Données" pour charger les inscriptions.</div></div>
   </div>
-</div>
-
-<!-- GUIDE -->
-<div id="t-guide" style="display:none">
-  <div class="card">
-    <div class="card-label">Comment mettre votre page en ligne gratuitement</div>
-    <div class="step"><div class="snum">1</div><div class="stxt">Allez sur <strong>github.com</strong> et cr&eacute;ez un compte gratuit si vous n'en avez pas encore.</div></div>
-    <div class="step"><div class="snum">2</div><div class="stxt">Cliquez sur <strong>"New repository"</strong>. Nommez-le <code>elode-promote2026</code>, cochez <strong>"Public"</strong>, puis <strong>"Create repository"</strong>.</div></div>
-    <div class="step"><div class="snum">3</div><div class="stxt">Sur la page du d&eacute;p&ocirc;t vide, cliquez le lien <strong>"uploading an existing file"</strong>. Glissez-d&eacute;posez le fichier t&eacute;l&eacute;charg&eacute;.</div></div>
-    <div class="step"><div class="snum">4</div><div class="stxt">&#9888; Tr&egrave;s important : une fois le fichier gliss&eacute;, son nom appara&icirc;t dans un champ de texte. <strong>Cliquez ce champ et remplacez</strong> <code>elode-promote2026.html</code> par <code>index.html</code> avant de valider.</div></div>
-    <div class="step"><div class="snum">5</div><div class="stxt">Cliquez le bouton vert <strong>"Commit changes"</strong> pour confirmer l'upload.</div></div>
-    <div class="step"><div class="snum">6</div><div class="stxt">Allez dans <strong>Settings</strong> (onglet en haut du d&eacute;p&ocirc;t) &rarr; menu gauche <strong>"Pages"</strong> &rarr; sous "Branch" choisissez <strong>"main"</strong> &rarr; cliquez <strong>"Save"</strong>.</div></div>
-    <div class="step"><div class="snum">7</div><div class="stxt">Attendez 1-2 minutes. Votre URL sera :<br><code>https://[votre-pseudo].github.io/elode-promote2026</code><br><br>Revenez dans l'onglet <strong>"QR Codes"</strong>, collez l'URL et cliquez <strong>"Mettre &agrave; jour"</strong>.</div></div>
-    <div style="background:rgba(29,196,122,.08);border:.5px solid rgba(29,196,122,.25);border-radius:10px;padding:1rem;margin-top:.5rem">
-      <div style="font-size:12px;color:var(--g);font-weight:500;margin-bottom:.3rem">&#128161; Astuce pour renommer</div>
-      <div style="font-size:12px;color:var(--muted);line-height:1.7">Apr&egrave;s avoir gliss&eacute; le fichier sur GitHub, vous verrez son nom dans un champ &eacute;ditable. Cliquez dessus, effacez <code>elode-promote2026.html</code> et tapez <code>index.html</code>.</div>
-    </div>
+  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:.5rem">
+    Données stockées dans Google Sheets &mdash; 
+    <a href="https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ" target="_blank" style="color:var(--g)">Ouvrir le Sheet</a>
   </div>
 </div>
 
@@ -199,9 +211,10 @@ tr:last-child td{border-bottom:none}
 <script>
 
 var PHONE = '237698193590';
-var FORM_URL = location.href.split('?')[0].split('#')[0];
-var entries = [];
-try { entries = JSON.parse(localStorage.getItem('elode_v3') || '[]'); } catch(e) {}
+var WEBAPP = 'https://script.google.com/macros/s/AKfycbwHS5CiF8XVmZvLZaAuxT7t2-YM-p2vtc8YQ98ORr5KsEkv_zdt2wwyrYevZO3QqagZ/exec';
+var FORM_URL = 'https://bissusSama.github.io/elode-promote2026';
+var ADMIN_PASS = 'elode2026';
+var adminUnlocked = false;
 
 function buildWA(url) {
   var msg = 'Bienvenue chez ELODE \uD83C\uDF89\n'
@@ -239,6 +252,19 @@ function genQRs() {
   makeQR('qr1', buildWA(FORM_URL));
   makeQR('qr2', FORM_URL);
   document.getElementById('url-preview').textContent = FORM_URL;
+  document.getElementById('url-display').textContent = FORM_URL;
+}
+
+function checkPass() {
+  var p = document.getElementById('admin-pass').value;
+  if (p === ADMIN_PASS) {
+    adminUnlocked = true;
+    document.getElementById('lock-box').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+  } else {
+    document.getElementById('pass-err').textContent = 'Mot de passe incorrect.';
+    document.getElementById('admin-pass').value = '';
+  }
 }
 
 function updateURL() {
@@ -246,7 +272,8 @@ function updateURL() {
   if (!v || v.indexOf('http') !== 0) { alert('URL invalide. Elle doit commencer par https://'); return; }
   FORM_URL = v;
   genQRs();
-  alert('QR codes mis \u00e0 jour !');
+  document.getElementById('gh-url').value = '';
+  alert('QR codes mis \u00e0 jour avec : ' + v);
 }
 
 function dlQR(cid, name) {
@@ -271,14 +298,14 @@ function dlQR(cid, name) {
 }
 
 function showTab(n) {
-  var tabs = ['qr','form','data','guide'];
+  var tabs = ['qr','form','data'];
   tabs.forEach(function(t) {
     document.getElementById('t-'+t).style.display = t === n ? 'block' : 'none';
   });
   document.querySelectorAll('.tb').forEach(function(el, i) {
     el.classList.toggle('active', tabs[i] === n);
   });
-  if (n === 'data') renderData();
+  if (n === 'data') loadData();
 }
 
 function submitForm() {
@@ -289,15 +316,34 @@ function submitForm() {
   var ville = document.getElementById('f-ville').value.trim();
   var besoin = document.getElementById('f-besoin').value;
   var date = document.getElementById('f-date').value;
+
   if (!nom || !prenom || !tel || !besoin) {
     alert('Veuillez remplir : nom, pr\u00e9nom, num\u00e9ro WhatsApp et besoin dentaire.');
     return;
   }
-  entries.push({nom:nom, prenom:prenom, tel:tel, age:age, ville:ville, besoin:besoin, date:date, ts:new Date().toLocaleDateString('fr-FR')});
-  try { localStorage.setItem('elode_v3', JSON.stringify(entries)); } catch(e) {}
-  document.getElementById('cnt-tab').textContent = entries.length;
-  document.getElementById('fw').style.display = 'none';
-  document.getElementById('ok').style.display = 'block';
+
+  var btn = document.getElementById('submit-btn');
+  var sp = document.getElementById('submit-spinner');
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours...';
+  sp.style.display = 'block';
+
+  var payload = {nom:nom, prenom:prenom, tel:tel, age:age, ville:ville, besoin:besoin, date:date};
+
+  fetch(WEBAPP, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(function() {
+    document.getElementById('fw').style.display = 'none';
+    document.getElementById('ok').style.display = 'block';
+  }).catch(function() {
+    alert('Erreur de connexion. V\u00e9rifiez votre internet et r\u00e9essayez.');
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ma demande \u2192';
+    sp.style.display = 'none';
+  });
 }
 
 function resetForm() {
@@ -305,41 +351,41 @@ function resetForm() {
   document.getElementById('f-besoin').value = '';
   document.getElementById('fw').style.display = 'block';
   document.getElementById('ok').style.display = 'none';
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = false;
+  btn.textContent = 'Envoyer ma demande \u2192';
+  document.getElementById('submit-spinner').style.display = 'none';
 }
 
-function renderData() {
-  document.getElementById('cnt').textContent = entries.length;
-  document.getElementById('cnt-tab').textContent = entries.length;
+function loadData() {
   var el = document.getElementById('entries');
-  if (!entries.length) {
-    el.innerHTML = '<div class="empty">Aucune inscription pour l\'instant.</div>';
-    return;
-  }
-  var rows = entries.map(function(e) {
-    return '<tr><td>'+e.nom+'</td><td>'+e.prenom+'</td><td>'+e.tel+'</td><td>'+(e.age||'\u2014')+'</td><td>'+(e.ville||'\u2014')+'</td><td>'+e.besoin+'</td><td>'+(e.date||'\u2014')+'</td><td>'+e.ts+'</td></tr>';
-  }).join('');
-  el.innerHTML = '<div class="tw"><table><thead><tr><th>Nom</th><th>Pr\u00e9nom</th><th>WhatsApp</th><th>\u00c2ge</th><th>Ville</th><th>Besoin</th><th>Date</th><th>Inscrit le</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  el.innerHTML = '<div class="empty">Chargement depuis Google Sheets...</div>';
+  fetch('https://docs.google.com/spreadsheets/d/1D2BlvTWtp8keqhNTMWyCZ9xoYbJRBelMGcCibY77qVQ/gviz/tq?tqx=out:json&sheet=Sheet1')
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      var json = JSON.parse(text.replace(/.*?(\{.*\}).*/s, '$1'));
+      var rows = json.table.rows;
+      if (!rows || rows.length <= 1) {
+        el.innerHTML = '<div class="empty">Aucune inscription pour l\'instant.</div>';
+        document.getElementById('cnt-tab').textContent = '0';
+        return;
+      }
+      var dataRows = rows.slice(1);
+      document.getElementById('cnt-tab').textContent = dataRows.length;
+      var html = '<div class="tw"><table><thead><tr><th>Date</th><th>Nom</th><th>Pr\u00e9nom</th><th>WhatsApp</th><th>\u00c2ge</th><th>Ville</th><th>Besoin</th><th>Date souhait\u00e9e</th></tr></thead><tbody>';
+      dataRows.forEach(function(row) {
+        var c = row.c;
+        var get = function(i) { return (c[i] && c[i].v) ? c[i].v : '\u2014'; };
+        html += '<tr><td>'+get(0)+'</td><td>'+get(1)+'</td><td>'+get(2)+'</td><td>'+get(3)+'</td><td>'+get(4)+'</td><td>'+get(5)+'</td><td>'+get(6)+'</td><td>'+get(7)+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    }).catch(function() {
+      el.innerHTML = '<div class="empty">Impossible de charger les donn\u00e9es.<br>V\u00e9rifiez que votre Google Sheet est en acc\u00e8s public.</div>';
+    });
 }
 
-function exportCSV() {
-  if (!entries.length) { alert('Aucune donn\u00e9e \u00e0 exporter.'); return; }
-  var h = ['Nom','Pr\u00e9nom','WhatsApp','\u00c2ge','Ville/Quartier','Besoin dentaire','Date souhait\u00e9e','Date inscription'];
-  var rows = entries.map(function(e) {
-    return [e.nom,e.prenom,e.tel,e.age,e.ville,e.besoin,e.date,e.ts].map(function(v) {
-      return '"' + (v||'').replace(/"/g,'""') + '"';
-    }).join(',');
-  });
-  var csv = [h.join(',')].concat(rows).join('\n');
-  var a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
-  a.download = 'elode_inscriptions_promote2026.csv';
-  a.click();
-}
-
-window.addEventListener('load', function() {
-  genQRs();
-  document.getElementById('cnt-tab').textContent = entries.length;
-});
+window.addEventListener('load', function() { genQRs(); });
 
 </script>
 </body>
